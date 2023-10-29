@@ -1,7 +1,19 @@
 from fastapi import FastAPI
 from influxdb_client import InfluxDBClient
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+# Allow requests from your React frontend (replace with your frontend URL)
+origins = ["http://localhost:3000"]  # Add your frontend URL here
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 token = "PNnMUu2JqpF8MdrpqQsg2ofZvnRvi0UfNGcMi62tTlNi6o-APZKHMzM7XKEJnHl--iNspWJywHrQo9A_6rCO7Q=="
 org = "IoT"
@@ -21,7 +33,7 @@ async def get_data():
     # Execute the query
     tables = client.query_api().query(org=org, query=query)
 
-    data = []
+    data = []   
 
     for table in tables:
         for record in table.records:
@@ -30,7 +42,7 @@ async def get_data():
             }
 
             # Mapping the liquidTemp and other fields to their corresponding values
-            for field_name in ["humidity","liquidTemp", "rainValue", "soilMoistureValue", "temperature"]:
+            for field_name in ["humidity", "liquidTemp", "rainValue", "soilMoistureValue", "temperature"]:
                 if record.values["_field"] == field_name:
                     data_point[field_name] = record.values["_value"]
 
