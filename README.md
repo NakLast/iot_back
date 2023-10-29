@@ -1,3 +1,3 @@
 "# iot_back" 
 
-pip in
+uvicorn main:app --reload
